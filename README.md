@@ -7,7 +7,6 @@ A PyTorch variational autoencoder for unconditional generation of **128 x 128 gr
 ```text
 README.md
 requirements.txt
-.gitignore
 as1.ipynb
 outputs/
   config.json
