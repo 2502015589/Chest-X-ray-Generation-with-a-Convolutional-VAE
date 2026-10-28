@@ -8,9 +8,8 @@ A PyTorch variational autoencoder for unconditional generation of **128 x 128 gr
 README.md
 requirements.txt
 .gitignore
-notebooks/
-  as1.ipynb
-results/
+as1.ipynb
+outputs/
   config.json
   loss_history.json
   loss_curves.png
@@ -18,11 +17,17 @@ results/
   samples_epoch10.png
   samples_epoch20.png
   samples_epoch30.png
-  metrics_128.json
+  samples_epoch40.png
+  samples_epoch50.png
+  samples_epoch60.png
+  samples_epoch70.png
+  samples_epoch80.png
+  original_evaluation/
+    metrics_128.json
   provenance.json
 ```
 
-`notebooks/as1.ipynb` is the upload-ready copy of the current root notebook. The test-transform definition was moved before construction of the test dataset so the evaluation cells can execute in order. Training and evaluation logic are otherwise unchanged. The root notebook is preserved locally. This package excludes old decoder experiments and report files.
+`as1.ipynb` at the repository root is the project notebook. Run it from the repository root so its relative data and output paths resolve correctly. Saved experiment artifacts are in `outputs/`. Old decoder experiments and report files are not included in the upload scope.
 
 ## Dataset
 
@@ -48,19 +53,11 @@ Use a virtual environment, then:
 python -m pip install -r requirements.txt
 ```
 
-Open `notebooks/as1.ipynb` in VS Code or Jupyter and select that environment. Python 3.13.2 is recorded in the source notebook. For a browser interface, optionally install JupyterLab with `python -m pip install jupyterlab` and launch `python -m jupyterlab`.
+Open `as1.ipynb` in VS Code or Jupyter and select that environment. Python 3.13.2 is recorded in the source notebook. For a browser interface, optionally install JupyterLab with `python -m pip install jupyterlab` and launch `python -m jupyterlab`.
 
-**Use the repository root as the kernel working directory**, because dataset and output paths are relative to it. If the kernel starts inside `notebooks/`, run this once in a temporary cell before the existing cells:
+**Use the repository root as the kernel working directory**, because dataset and output paths are relative to it.
 
-```python
-from pathlib import Path
-import os
-if Path.cwd().name == "notebooks":
-    os.chdir(Path.cwd().parent)
-print(Path.cwd())
-```
-
-Run the cells in order to train and evaluate. Running all cells starts a fresh 30-epoch training run and writes to `outputs/`; back up any existing outputs first. **No training or evaluation was rerun to prepare these repository files.**
+Run the cells in order to train and evaluate. Running all cells starts a fresh training run using the current `EPOCHS` value in the notebook and writes to `outputs/`; back up any existing outputs first. **No training or evaluation was rerun to prepare these repository files.**
 
 For CUDA, use a matching PyTorch/torchvision CUDA build from the [official installation selector](https://pytorch.org/get-started/locally/). The dependency pins record local package versions but do not specify a CUDA build. Inception weights require network access on first metric evaluation. If DataLoader workers hang on Windows/Jupyter, try `num_workers=0` instead of the original setting of 2.
 
@@ -76,7 +73,7 @@ Five encoder blocks use stride-2 convolutions with channels 32, 64, 128, 256, 51
 | Optimizer | Adam |
 | Learning rate | 0.001 |
 | Batch size | 64 |
-| Epochs | 30 |
+| Epochs | 80 |
 | KL weight | 1.0 |
 | Training / evaluation seed | 42 / 342 |
 
@@ -86,20 +83,24 @@ The objective is pixel-summed BCE plus KL divergence, averaged over images. The 
 
 | Metric | Value |
 |---|---:|
-| Final training total loss | 10271.2665 |
-| Final reconstruction loss | 10224.7753 |
-| Final KL | 46.4913 |
-| Ignite-default FID (lower is better) | 0.100035 |
-| Inception Score | 1.414462 |
+| Final training total loss | 10250.8882 |
+| Final reconstruction loss | 10206.5100 |
+| Final KL | 44.3783 |
+| Ignite-default FID (lower is better) | 0.152624 |
+| Inception Score | 1.670664 |
 | Real / generated evaluation count | 624 / 624 |
 
 Losses are in nats per image. Values are taken from the current saved JSON files, not earlier screenshots.
 
-![Training loss curves](results/loss_curves.png)
+![Training loss curves](outputs/loss_curves.png)
 
-![Generated samples](results/final_samples.png)
+![Generated samples](outputs/final_samples.png)
 
-Fixed-latent samples from epochs 10, 20 and 30 are also included. `config.json` records settings extracted from the source notebook; `provenance.json` records primary source paths, checksums and the local packaging environment.
+Fixed-latent samples every 10 epochs through epoch 80 are also included. `outputs/config.json` records the configuration packaged with the saved 80-epoch results; it is not automatically synchronized when the notebook is edited. `outputs/provenance.json` records file paths and checksums, including the current root notebook. Saved results describe the completed experiment, not a guarantee that the current notebook is unchanged from that run.
+
+## Training interpretation
+
+The saved history contains **80 epochs**. Total loss decreases from 10920.2916 to 10250.8882. Between epochs 30 and 80, it falls from 10270.5571 to 10250.8882, an improvement of only 0.192%, indicating diminishing returns. Some samples show more local texture, but remain blurred; anatomical fidelity has not been established. No validation-loss curve is recorded, so this run does not establish overfitting.
 
 ## Evaluation and limitations
 
@@ -109,4 +110,4 @@ These scores use **Ignite's default 1000-dimensional ImageNet Inception output**
 
 ## GitHub upload
 
-Commit `README.md`, `requirements.txt`, `.gitignore`, `notebooks/`, and `results/`. Do not include the dataset, weights, virtual environments or older experiments. Review the course policy before publishing assignment solutions. No license is assumed or assigned by this packaging step.
+Commit `README.md`, `requirements.txt`, `.gitignore`, the root `as1.ipynb`, and the images/JSON files in `outputs/`. Do not include the dataset, weights, virtual environments or older experiments. Review the course policy before publishing assignment solutions. No license is assumed or assigned by this packaging step.

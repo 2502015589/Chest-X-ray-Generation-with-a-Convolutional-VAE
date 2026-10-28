@@ -1,0 +1,48 @@
+{
+  "note": "Manifest of existing output artifacts and the current root as1.ipynb. No notebook code was modified or executed for this documentation update. The notebook may have been edited after training; its current checksum does not prove it produced these artifacts. Saved loss history contains 80 epochs.",
+  "epochs_recorded": 80,
+  "sources": {
+    "as1.ipynb": {
+      "sha256": "01eb872d78b3a3b16cdc6ddb6bd7d7328b2e9c608400f27dfb059fb74c675491"
+    },
+    "outputs/config.json": {
+      "sha256": "dd525faf9d3e8dd72ef0cfd7571f52897c1cdc9dd39f67fa10867d768ea81816"
+    },
+    "outputs/loss_history.json": {
+      "sha256": "e7f32b71ad0ccd251244726dae052dbc7cf1a682b9e71a42b23424a7a1bce7e4"
+    },
+    "outputs/loss_curves.png": {
+      "sha256": "a51c84a0c3f33205df4cd5161a4442d20ed1fee50cc3b7a035ab2414bf9b1e52"
+    },
+    "outputs/final_samples.png": {
+      "sha256": "1d681d7bb8ee3041e152001b61ee627096c11ece63acd125cddd6db0a2ea13b1"
+    },
+    "outputs/original_evaluation/metrics_128.json": {
+      "sha256": "a87a01f091eb25fb98c3a6bed7ca7d77e18217d07b6565cb1d68890d2092ad20"
+    },
+    "outputs/samples_epoch10.png": {
+      "sha256": "3bd0649c3608f2fa9259a0da747a57e013f69d650f6ef2f248f5e2b6312d0f65"
+    },
+    "outputs/samples_epoch20.png": {
+      "sha256": "730e5537969f6088e7f4e04ac81bc11e442ef6fc1f3d4a95ed0a5b97b935e0ea"
+    },
+    "outputs/samples_epoch30.png": {
+      "sha256": "a3f0543c389409afa10beec455216c9ebb1c560c1b60cce4743f4020af178c65"
+    },
+    "outputs/samples_epoch40.png": {
+      "sha256": "5fb31a85b43cdc4e317fcfac16dc366ba0fd0e05f8e896020aa2950f6ad0441d"
+    },
+    "outputs/samples_epoch50.png": {
+      "sha256": "34caf6d359f36863ae1c0524bce84d95ee79c3a3d603e5e7b8c2ee14300a224b"
+    },
+    "outputs/samples_epoch60.png": {
+      "sha256": "031db94047215adebe80764c7b0bfe1821fc28dd12e5b1136161f0d2bdc2a1f0"
+    },
+    "outputs/samples_epoch70.png": {
+      "sha256": "597466ce072caa06c632795940729bc3b7177302ece4fda28d3023bcbff1c120"
+    },
+    "outputs/samples_epoch80.png": {
+      "sha256": "1244a19a0e4ecfe5b8227c5f7b7dfc1e5fe6cda292c10b5c65bd629505a2aaf8"
+    }
+  }
+}
