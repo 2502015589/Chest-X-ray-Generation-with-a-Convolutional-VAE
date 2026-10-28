@@ -1,0 +1,12 @@
+{
+  "fid": 0.15262399176428965,
+  "inception_score": 1.6706642558968603,
+  "n_real": 624,
+  "n_generated": 624,
+  "image_size": 128,
+  "latent_dim": 128,
+  "seed": 342,
+  "ignite_version": "0.5.5",
+  "preprocessing": "grayscale, Resize + CenterCrop, [0,1], PIL RGB bilinear resize to 299x299",
+  "metric_implementation": "Ignite default Inception, 1000 dimensions"
+}

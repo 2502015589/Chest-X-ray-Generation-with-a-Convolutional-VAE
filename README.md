@@ -22,8 +22,7 @@ outputs/
   samples_epoch60.png
   samples_epoch70.png
   samples_epoch80.png
-  original_evaluation/
-    metrics_128.json
+  metrics_128.json
   provenance.json
 ```
 
