@@ -1,107 +1,85 @@
-# Chest X-ray Generation with a Convolutional VAE
+# Chest X-ray Generation with a Variational Autoencoder
 
-A PyTorch variational autoencoder for unconditional generation of **128 x 128 grayscale chest X-rays**. 
+This project implements a convolutional variational autoencoder (VAE) in PyTorch to generate grayscale chest X-ray images. The model learns a 128-dimensional latent representation and generates images at a resolution of 128 × 128.
 
-## Files
+## Setup and usage
 
-```text
-README.md
-requirements.txt
-as1.ipynb
-outputs/
-  loss_history.json
-  loss_curves.png
-  final_samples.png
-  samples_epoch10.png
-  samples_epoch20.png
-  samples_epoch30.png
-  samples_epoch40.png
-  samples_epoch50.png
-  samples_epoch60.png
-  samples_epoch70.png
-  samples_epoch80.png
-  metrics_128.json
-```
+### Environment
 
-`as1.ipynb` at the repository root is the project notebook. Run it from the repository root so its relative data and output paths resolve correctly. Saved experiment artifacts are in `outputs/`. 
+- Python 3.13.2
+- PyTorch 2.6.0 with CUDA 12.4
+- NVIDIA GeForce RTX 4050 Laptop GPU
 
-## Dataset
-
-Download [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia) , and place it at the repository root:
-
-```text
-chest_xray/
-  train/NORMAL/
-  train/PNEUMONIA/
-  val/NORMAL/
-  val/PNEUMONIA/
-  test/NORMAL/
-  test/PNEUMONIA/
-```
-
-Local split sizes: train 5,216; validation 16; test 624. The model is trained on the training set. The final-epoch checkpoint is used for generation and evaluated against the test set using FID and Inception Score.
-
-## Setup
-
-Environment:
-
-```
-Python 3.13.2
-PyTorch 2.6.0 with CUDA 12.4
-NVIDIA GeForce RTX 4050 Laptop GPU
-```
-
-Dependencies: 
+### Install dependencies
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-Open `as1.ipynb` and execute the cells in order. Use the project root as the working directory.
+### Run
 
+Open `as1.ipynb` and execute the cells in order, using the project root as the working directory. Training results and model weights are saved in `outputs/`.
 
-## Model and hyperparameters
+## Dataset
 
-Five encoder blocks use stride-2 convolutions with channels 32, 64, 128, 256, 512, BatchNorm and LeakyReLU. Linear heads predict a diagonal Gaussian mean and log-variance. Reparameterization produces latent samples. The decoder uses transposed convolutions with BatchNorm/ReLU and a final Sigmoid.
+The project uses the [Chest X-Ray Images (Pneumonia) dataset](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia).
 
-| Setting | Value |
+The training set contains 5,216 images, and the test set contains 624 images. Class labels are not used because the model performs unconditional generation.
+
+## Model and training
+
+The encoder consists of five convolutional blocks with 32, 64, 128, 256, and 512 output channels. Each block uses a stride-2 convolution, batch normalization, and LeakyReLU. Two fully connected layers predict the mean and log-variance of a diagonal Gaussian latent distribution.
+
+Latent vectors are sampled using the reparameterization trick. The decoder reconstructs images through transposed convolutions, with batch normalization and ReLU in intermediate layers and a final Sigmoid activation.
+
+The training objective combines binary cross-entropy reconstruction loss and KL divergence.
+
+| Parameter | Value |
 |---|---|
-| Image size | 128 x 128, grayscale |
-| Preprocessing | Resize preserving aspect ratio, CenterCrop, ToTensor [0,1] |
+| Image size | 128 × 128 |
 | Latent dimension | 128 |
 | Optimizer | Adam |
 | Learning rate | 0.001 |
 | Batch size | 64 |
-| Epochs | 80 |
+| Training epochs | 80 |
 | KL weight | 1.0 |
-| Training / evaluation seed | 42 / 342 |
+| Training seed | 42 |
+| Evaluation seed | 342 |
 
-The objective is pixel-summed BCE plus KL divergence, averaged over images. The data loader uses `drop_last=True`, omitting the final incomplete batch of 32 images each epoch. Model weights are saved to `outputs/vae.pt` after training.
+## Results
 
-## Existing results
+### Training loss
 
-| Metric | Value |
-|---|---:|
-| Final training total loss | 10250.8882 |
-| Final reconstruction loss | 10206.5100 |
-| Final KL | 44.3783 |
-| Ignite-default FID (lower is better) | 0.152624 |
-| Inception Score | 1.670664 |
-| Real / generated evaluation count | 624 / 624 |
-
-Losses are in nats per image. Values are taken from the current saved JSON files, not earlier screenshots.
+The training loss decreased from 10920.29 to 10250.89 over 80 epochs. It dropped rapidly during the early stages and gradually stabilized.
 
 ![Training loss curves](outputs/loss_curves.png)
 
-![Generated samples](outputs/final_samples.png)
+| Final training loss | Value |
+|---|---:|
+| Total | 10250.8882 |
+| Reconstruction | 10206.5100 |
+| KL divergence | 44.3783 |
 
-Generated samples from fixed latent vectors are saved every 10 epochs through epoch 80. The experiment configuration is recorded in `outputs/config.json`.
+### Generated images
 
-## Training interpretation
+Images are generated by sampling latent vectors from a standard normal distribution and passing them through the decoder.
 
-The training loss decreased from 10920.29 to 10250.89 over 80 epochs. It dropped rapidly during the early stages and gradually stabilized as training progressed. Generated images capture coarse thoracic structure but remain blurred and lack fine anatomical detail. Lower training loss alone does not establish better generation quality.
+![Generated chest X-rays](outputs/final_samples.png)
 
-## Evaluation
+The generated images capture coarse thoracic structure but remain blurred and lack fine anatomical detail. Fixed-latent samples are also saved every 10 epochs to visualize changes during training.
 
-The model was evaluated using 624 real test images and 624 generated images. Both real and generated images were converted to RGB and resized to 299 × 299 using bilinear interpolation. FID and Inception Score were computed using PyTorch-Ignite, yielding 0.1526 and 1.6707, respectively.
+### Evaluation
 
+FID and Inception Score are computed using PyTorch-Ignite with 624 real test images and 624 generated images. Both real and generated images are converted to RGB and resized to 299 × 299 using bilinear interpolation.
+
+| Metric | Value |
+|---|---:|
+| Ignite-default FID | 0.152624 |
+| Inception Score | 1.670664 |
+
+The evaluation uses Ignite's default 1,000-dimensional Inception output. The reported FID is therefore not directly comparable to FID computed using 2,048-dimensional pooling features. These ImageNet-based metrics do not directly measure anatomical accuracy or clinical validity.
+
+## References
+
+- Kingma, D. P., and Welling, M. [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114). ICLR, 2014.
+- PyTorch-Ignite. [GAN evaluation using FID and IS](https://pytorch-ignite.ai/blog/gan-evaluation-with-fid-and-is/).
